@@ -10,6 +10,7 @@ import androidx.test.rule.GrantPermissionRule
 import com.orgzly.R
 import com.orgzly.android.App
 import com.orgzly.android.OrgzlyTest
+import com.orgzly.android.RetryTestRule
 import com.orgzly.android.espresso.util.EspressoUtils.clickClickableSpan
 import com.orgzly.android.espresso.util.EspressoUtils.onBook
 import com.orgzly.android.espresso.util.EspressoUtils.onNoteInBook
@@ -29,6 +30,9 @@ import org.junit.runners.Parameterized
 class ExternalLinksTest(private val param: Parameter) : OrgzlyTest() {
 
     data class Parameter(val link: String, val check: () -> Any)
+
+    @get:Rule
+    val retryTestRule = RetryTestRule()
 
     @get:Rule
     val grantPermissionRule: GrantPermissionRule = if (Build.VERSION.SDK_INT >= 33) {

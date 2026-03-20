@@ -8,16 +8,21 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import com.orgzly.R
 import com.orgzly.android.OrgzlyTest
+import com.orgzly.android.RetryTestRule
 import com.orgzly.android.espresso.util.EspressoUtils.*
 import com.orgzly.android.ui.main.MainActivity
 import org.hamcrest.CoreMatchers.allOf
 import org.hamcrest.CoreMatchers.instanceOf
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
 
 class InternalLinksTest : OrgzlyTest() {
+    @get:Rule
+    val retryTestRule = RetryTestRule()
+
     private lateinit var scenario: ActivityScenario<MainActivity>
 
     @Before
@@ -82,6 +87,7 @@ class InternalLinksTest : OrgzlyTest() {
         scenario = ActivityScenario.launch(MainActivity::class.java)
 
         onBook(0).perform(click())
+        onView(isRoot()).perform(waitId(R.id.fragment_book_recycler_view, 5000))
     }
 
     @After
