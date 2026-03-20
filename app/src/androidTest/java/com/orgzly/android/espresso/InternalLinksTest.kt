@@ -1,6 +1,5 @@
 package com.orgzly.android.espresso
 
-import android.os.SystemClock
 import android.widget.TextView
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
@@ -95,7 +94,7 @@ class InternalLinksTest : OrgzlyTest() {
     fun testDifferentCaseUuidInternalLink() {
         onNoteInBook(1, R.id.item_head_content_view)
                 .perform(clickClickableSpan("id:bdce923b-C3CD-41ED-B58E-8BDF8BABA54F"))
-        SystemClock.sleep(500)
+        onView(isRoot()).perform(waitId(R.id.title_view, 5000))
         onView(withId(R.id.title_view)).check(matches(withText("Note [b-2]")))
     }
 
@@ -103,7 +102,7 @@ class InternalLinksTest : OrgzlyTest() {
     fun testDifferentCaseCustomIdInternalLink() {
         onNoteInBook(2, R.id.item_head_content_view)
                 .perform(clickClickableSpan("#Different case custom id"))
-        SystemClock.sleep(500)
+        onView(isRoot()).perform(waitId(R.id.title_view, 5000))
         onView(withId(R.id.title_view)).check(matches(withText("Note [b-1]")))
     }
 
@@ -111,7 +110,7 @@ class InternalLinksTest : OrgzlyTest() {
     fun testCustomIdLink() {
         onNoteInBook(3, R.id.item_head_content_view)
                 .perform(clickClickableSpan("#Link to note in a different book"))
-        SystemClock.sleep(500)
+        onView(isRoot()).perform(waitId(R.id.title_view, 5000))
         onView(withId(R.id.title_view)).check(matches(withText("Note [b-3]")))
     }
 
@@ -119,6 +118,7 @@ class InternalLinksTest : OrgzlyTest() {
     fun testBookLink() {
         onNoteInBook(4, R.id.item_head_content_view)
                 .perform(clickClickableSpan("file:book-b.org"))
+        onView(isRoot()).perform(waitId(R.id.fragment_book_view_flipper, 5000))
         onView(withId(R.id.fragment_book_view_flipper)).check(matches(isDisplayed()))
         onNoteInBook(1, R.id.item_head_title_view).check(matches(withText("Note [b-1]")))
     }
@@ -127,6 +127,7 @@ class InternalLinksTest : OrgzlyTest() {
     fun testBookRelativeLink() {
         onNoteInBook(5, R.id.item_head_content_view)
                 .perform(clickClickableSpan("file:./book-b.org"))
+        onView(isRoot()).perform(waitId(R.id.fragment_book_view_flipper, 5000))
         onView(withId(R.id.fragment_book_view_flipper)).check(matches(isDisplayed()))
         onNoteInBook(1, R.id.item_head_title_view).check(matches(withText("Note [b-1]")))
     }
@@ -135,7 +136,7 @@ class InternalLinksTest : OrgzlyTest() {
     fun testNonExistentId() {
         onNoteInBook(6, R.id.item_head_content_view)
             .perform(clickClickableSpan("id:note-with-this-id-does-not-exist"))
-        SystemClock.sleep(500)
+        onView(isRoot()).perform(waitId(com.google.android.material.R.id.snackbar_text, 5000))
         onSnackbar()
             .check(matches(withText("No note or book found with the “ID” property set to “note-with-this-id-does-not-exist”")))
     }
@@ -145,10 +146,14 @@ class InternalLinksTest : OrgzlyTest() {
         onNoteInBook(7, R.id.item_head_content_view)
             .perform(clickClickableSpan("Link to book-b by id"))
 
-        // In book
+        // Wait for book view to load with content
+        onView(isRoot()).perform(waitId(R.id.fragment_book_view_flipper, 5000))
         onView(withId(R.id.fragment_book_view_flipper)).check(matches(isDisplayed()))
 
-        // In book-b
+        // Verify we're in book-b by checking its first note
+        onNoteInBook(1, R.id.item_head_title_view).check(matches(withText("Note [b-1]")))
+
+        // Verify toolbar shows book-b
         onView(allOf(instanceOf(TextView::class.java), withParent(withId(R.id.top_toolbar))))
             .check(matches(withText("book-b")))
     }
